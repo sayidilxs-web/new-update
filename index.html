@@ -1,1 +1,190 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' data: blob:; img-src 'self' data: blob: https: http:; media-src 'self' data: blob:; connect-src 'self' https: http:; frame-src https: http:; child-src https: http:;">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>ShadowRecon Ultimate – Custom Ready</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
+  <!-- ড্রাগন অ্যানিমেশনের ক্যানভাস (renderer.js startDragon() এটি খুঁজবে) -->
+  <canvas id="dragonCanvas" aria-hidden="true"></canvas>
+
+  <!-- হেডার ও টার্গেট বার -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="logoGlow"></div>
+      <div class="brandText">
+        <div class="title">ShadowRecon Base <span class="muted">– Custom Ready</span></div>
+        <div class="subtitle">Defensive configuration review • Redacted traffic timing log • Report export</div>
+      </div>
+    </div>
+
+    <div class="targetBar glass">
+      <input id="targetInput" class="input" type="text" spellcheck="false" value="https://example.com/" placeholder="Target URL (e.g., https://example.com)">
+      <button id="goBtn" class="btn btn-secondary">🌐 GO</button>
+      <button id="runDefensiveBtn" class="btn btn-primary">🛡️ RUN DEFENSIVE CHECKS</button>
+      <button id="runCustomBtn" class="btn btn-warning">🔧 RUN CUSTOM TOOLS</button>
+      <button id="compressBtn" class="btn btn-success">📦 COMPRESS ALL REPORTS</button>
+    </div>
+  </header>
+
+  <!-- মূল লেআউট -->
+  <main class="layout">
+    <!-- সাইডবার ট্যাব বাটন -->
+    <aside class="sidebar glass">
+      <button class="tabBtn active" data-tab="tabBrowser">🧭 WebView</button>
+      <button class="tabBtn" data-tab="tabChecks">🛡️ Defensive Checks</button>
+      <button class="tabBtn" data-tab="tabTraffic">📡 Traffic Log</button>
+      <button class="tabBtn" data-tab="tabReports">📄 Reports</button>
+      <button class="tabBtn" data-tab="tabSettings">⚙️ Settings</button>
+      <button class="tabBtn" data-tab="tabLocal">ℹ️ Local</button>
+      <div class="sideHint">
+        ⚡ ট্রাফিক লগে কুকি/হেডার সংরক্ষণ করা হয় না।<br>
+        শুধুমাত্র URL, স্ট্যাটাস, টাইমিং।
+      </div>
+    </aside>
+
+    <!-- কন্টেন্ট এলাকা (সব ট্যাব) -->
+    <section class="content">
+      <!-- WebView ট্যাব -->
+      <div id="tabBrowser" class="tab active">
+        <div class="panelTitle">Chromium WebView</div>
+        <div class="webviewWrap glass">
+          <webview id="webview" src="https://example.com/" partition="persist:shadowrecon" allowpopups="true" webpreferences="contextIsolation=yes, nativeWindowOpen=yes"></webview>
+        </div>
+      </div>
+
+      <!-- Defensive Checks ট্যাব -->
+      <div id="tabChecks" class="tab">
+        <div class="panelTitle">Integrated Defensive Checks</div>
+        <div class="glass panel">
+          <div class="row">
+            <div class="label">Progress</div>
+            <div class="progress"><div id="progressBar" class="progressBar"></div></div>
+            <div id="progressText" class="progressText">Ready.</div>
+          </div>
+          <div class="row">
+            <div class="label">Feed</div>
+            <div id="feed" class="feed"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Traffic Log ট্যাব -->
+      <div id="tabTraffic" class="tab">
+        <div class="panelTitle">Redacted Traffic Timing Log</div>
+        <div class="glass panel">
+          <div class="trafficHeader">
+            <div class="smallNote">No cookies, no headers. URL + status + method + resourceType only.</div>
+            <button id="clearTrafficBtn" class="btn btn-secondary btn-sm">🧹 Clear</button>
+          </div>
+          <div class="trafficTableWrap">
+            <table class="table">
+              <thead>
+                <tr><th>Time</th><th>Status</th><th>Method</th><th>Type</th><th>URL</th></tr>
+              </thead>
+              <tbody id="trafficBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reports ট্যাব -->
+      <div id="tabReports" class="tab">
+        <div class="panelTitle">Reports & Artifacts</div>
+        <div class="glass panel">
+          <div class="row">
+            <div class="label">Last run</div>
+            <div id="lastRun" class="mono">No run yet.</div>
+          </div>
+          <div class="row">
+            <div class="label">Fusion data snapshot</div>
+            <pre id="fusionPreview" class="pre"></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings ট্যাব (কাস্টম এডিটর) -->
+      <div id="tabSettings" class="tab">
+        <div class="panelTitle">Settings • Custom Tools Editor</div>
+        <div class="glass panel">
+          <div class="row">
+            <div class="label">Custom files</div>
+            <div>
+              <div class="smallNote">
+                এখানে আপনি <b>customModules.js</b> এবং <b>toolRunner.js</b> এডিট করে Save দিলে, অ্যাপ সাথে সাথে সেই কোড ব্যবহার করে “🔧 RUN CUSTOM TOOLS” চালাবে।
+                <br>নোট: নিরাপত্তার জন্য কাস্টম কোড sandbox‑এ লোড হয় (require/process নেই)। আপনার টুলগুলোকে ডিফেন্সিভ রিভিউ/ডাটা প্রসেসিং কাজে রাখুন।
+              </div>
+              <div class="settingsBtns">
+                <button id="openCustomDirBtn" class="btn btn-secondary btn-sm">📁 Open custom folder</button>
+                <button id="reloadEditorsBtn" class="btn btn-secondary btn-sm">🔄 Reload editors</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="twoCol">
+            <div class="codeCard">
+              <div class="codeHeader">
+                <div class="codeTitle">customModules.js</div>
+                <div class="codeActions">
+                  <button id="openCustomModulesBtn" class="btn btn-secondary btn-sm">Open</button>
+                  <button id="saveCustomModulesBtn" class="btn btn-success btn-sm">Save</button>
+                </div>
+              </div>
+              <textarea id="editorCustomModules" class="codeEditor" spellcheck="false"></textarea>
+              <div id="statusCustomModules" class="codeStatus smallNote"></div>
+            </div>
+
+            <div class="codeCard">
+              <div class="codeHeader">
+                <div class="codeTitle">toolRunner.js</div>
+                <div class="codeActions">
+                  <button id="openToolRunnerBtn" class="btn btn-secondary btn-sm">Open</button>
+                  <button id="saveToolRunnerBtn" class="btn btn-success btn-sm">Save</button>
+                </div>
+              </div>
+              <textarea id="editorToolRunner" class="codeEditor" spellcheck="false"></textarea>
+              <div id="statusToolRunner" class="codeStatus smallNote"></div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="label">Run</div>
+            <div class="settingsBtns">
+              <button id="runCustomFromSettingsBtn" class="btn btn-warning">🔧 RUN CUSTOM TOOLS</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Local ট্যাব -->
+      <div id="tabLocal" class="tab">
+        <div class="panelTitle">Local (Safe)</div>
+        <div class="glass panel">
+          <div class="row">
+            <div class="label">System Info</div>
+            <div id="systemInfo" class="smallNote">Loading...</div>
+          </div>
+          <div class="row">
+            <div class="label">Export</div>
+            <div class="smallNote">
+              “📦 COMPRESS ALL REPORTS” চাপলে রিপোর্টগুলো আপনার Downloads ফোল্ডারে ZIP আকারে সেভ হবে।
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- স্ট্যাটাস বার (ঐচ্ছিক) -->
+  <footer class="statusBar">
+    <span>ShadowRecon Ultimate – Ready | Dragon active | All systems online</span>
+  </footer>
+
+  <!-- রেন্ডারার স্ক্রিপ্ট (সব UI লজিক এখানে) -->
+  <script src="renderer.js"></script>
+</body>
+</html>
