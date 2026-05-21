@@ -1,65 +1,70 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' data: blob:; img-src 'self' data: blob: https: http:; media-src 'self' data: blob:; connect-src 'self' https: http:; frame-src https: http:; child-src https: http:;">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>ShadowRecon Ultimate – Custom Ready</title>
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>ShadowRecon Ultimate – No Limits</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <!-- ড্রাগন অ্যানিমেশনের ক্যানভাস (renderer.js startDragon() এটি খুঁজবে) -->
+  <!-- ===================== ড্রাগন অ্যানিমেশনের জন্য ক্যানভাস ===================== -->
   <canvas id="dragonCanvas" aria-hidden="true"></canvas>
 
-  <!-- হেডার ও টার্গেট বার -->
+  <!-- ===================== হেডার ও টার্গেট বার ===================== -->
   <header class="topbar">
     <div class="brand">
       <div class="logoGlow"></div>
       <div class="brandText">
-        <div class="title">ShadowRecon Base <span class="muted">– Custom Ready</span></div>
-        <div class="subtitle">Defensive configuration review • Redacted traffic timing log • Report export</div>
+        <div class="title">ShadowRecon <span class="muted">Ultimate</span></div>
+        <div class="subtitle">Unlimited power • 200 tools • 100 exploits • Dragon mode</div>
       </div>
     </div>
 
     <div class="targetBar glass">
-      <input id="targetInput" class="input" type="text" spellcheck="false" value="https://example.com/" placeholder="Target URL (e.g., https://example.com)">
+      <input id="targetInput" class="input" type="text" spellcheck="false" value="https://example.com/" placeholder="Target URL (e.g., https://example.com)" />
       <button id="goBtn" class="btn btn-secondary">🌐 GO</button>
-      <button id="runDefensiveBtn" class="btn btn-primary">🛡️ RUN DEFENSIVE CHECKS</button>
-      <button id="runCustomBtn" class="btn btn-warning">🔧 RUN CUSTOM TOOLS</button>
-      <button id="compressBtn" class="btn btn-success">📦 COMPRESS ALL REPORTS</button>
+      <button id="runDefensiveBtn" class="btn btn-primary">🛡️ DEFENSIVE CHECKS</button>
+      <button id="runCustomBtn" class="btn btn-warning">🔧 CUSTOM TOOLS</button>
+      <button id="compressBtn" class="btn btn-success">📦 COMPRESS REPORTS</button>
+      <button id="generateReportBtn" class="btn btn-info">📄 GEN REPORT</button>
     </div>
   </header>
 
-  <!-- মূল লেআউট -->
+  <!-- ===================== মুল লেআউট ===================== -->
   <main class="layout">
-    <!-- সাইডবার ট্যাব বাটন -->
+    <!-- সাইডবার (ট্যাব বাটন) -->
     <aside class="sidebar glass">
       <button class="tabBtn active" data-tab="tabBrowser">🧭 WebView</button>
-      <button class="tabBtn" data-tab="tabChecks">🛡️ Defensive Checks</button>
+      <button class="tabBtn" data-tab="tabChecks">🛡️ Defensive</button>
       <button class="tabBtn" data-tab="tabTraffic">📡 Traffic Log</button>
+      <button class="tabBtn" data-tab="tabTools">🔧 Tools (200)</button>
+      <button class="tabBtn" data-tab="tabExploits">💣 Exploits (100)</button>
+      <button class="tabBtn" data-tab="tabThreat">⚠️ Threat Intel</button>
       <button class="tabBtn" data-tab="tabReports">📄 Reports</button>
       <button class="tabBtn" data-tab="tabSettings">⚙️ Settings</button>
       <button class="tabBtn" data-tab="tabLocal">ℹ️ Local</button>
       <div class="sideHint">
-        ⚡ ট্রাফিক লগে কুকি/হেডার সংরক্ষণ করা হয় না।<br>
-        শুধুমাত্র URL, স্ট্যাটাস, টাইমিং।
+        ⚡ Unlimited mode | No restrictions | Dragon active<br>
+        All traffic monitored | Custom tools ready
       </div>
     </aside>
 
-    <!-- কন্টেন্ট এলাকা (সব ট্যাব) -->
+    <!-- কন্টেন্ট এলাকা -->
     <section class="content">
-      <!-- WebView ট্যাব -->
+      
+      <!-- 1. WebView ট্যাব -->
       <div id="tabBrowser" class="tab active">
-        <div class="panelTitle">Chromium WebView</div>
+        <div class="panelTitle">Chromium WebView – Full Control</div>
         <div class="webviewWrap glass">
           <webview id="webview" src="https://example.com/" partition="persist:shadowrecon" allowpopups="true" webpreferences="contextIsolation=yes, nativeWindowOpen=yes"></webview>
         </div>
       </div>
 
-      <!-- Defensive Checks ট্যাব -->
+      <!-- 2. Defensive Checks ট্যাব -->
       <div id="tabChecks" class="tab">
-        <div class="panelTitle">Integrated Defensive Checks</div>
+        <div class="panelTitle">Integrated Defensive Security Audit</div>
         <div class="glass panel">
           <div class="row">
             <div class="label">Progress</div>
@@ -67,19 +72,19 @@
             <div id="progressText" class="progressText">Ready.</div>
           </div>
           <div class="row">
-            <div class="label">Feed</div>
+            <div class="label">Live Feed</div>
             <div id="feed" class="feed"></div>
           </div>
         </div>
       </div>
 
-      <!-- Traffic Log ট্যাব -->
+      <!-- 3. Traffic Log ট্যাব -->
       <div id="tabTraffic" class="tab">
-        <div class="panelTitle">Redacted Traffic Timing Log</div>
+        <div class="panelTitle">Network Traffic Log (Redacted)</div>
         <div class="glass panel">
           <div class="trafficHeader">
-            <div class="smallNote">No cookies, no headers. URL + status + method + resourceType only.</div>
-            <button id="clearTrafficBtn" class="btn btn-secondary btn-sm">🧹 Clear</button>
+            <div class="smallNote">⚠️ Only URL, status, method, type – no cookies/headers logged</div>
+            <button id="clearTrafficBtn" class="btn btn-secondary btn-sm">🧹 Clear Log</button>
           </div>
           <div class="trafficTableWrap">
             <table class="table">
@@ -92,35 +97,76 @@
         </div>
       </div>
 
-      <!-- Reports ট্যাব -->
-      <div id="tabReports" class="tab">
-        <div class="panelTitle">Reports & Artifacts</div>
+      <!-- 4. Tools ট্যাব (২০০টি টুল) -->
+      <div id="tabTools" class="tab">
+        <div class="panelTitle">Ultimate Tool Arsenal – 200 Weapons</div>
+        <div class="glass panel">
+          <div class="smallNote">🔥 Click any tool to execute – full system access granted</div>
+          <div id="toolsContainer" class="toolsGrid"></div>
+        </div>
+      </div>
+
+      <!-- 5. Exploits ট্যাব (১০০টি এক্সপ্লয়েট) -->
+      <div id="tabExploits" class="tab">
+        <div class="panelTitle">Exploit Database – 100 Ready Payloads</div>
+        <div class="glass panel">
+          <div class="smallNote">💀 Target must be set before running exploits. Risk levels: Critical, High, Medium</div>
+          <div id="exploitContainer" class="exploitsGrid"></div>
+        </div>
+      </div>
+
+      <!-- 6. Threat Intelligence ট্যাব -->
+      <div id="tabThreat" class="tab">
+        <div class="panelTitle">Threat Intelligence & Malicious IP Tracking</div>
         <div class="glass panel">
           <div class="row">
-            <div class="label">Last run</div>
-            <div id="lastRun" class="mono">No run yet.</div>
+            <div class="label">Check IP</div>
+            <div style="display: flex; gap: 10px;">
+              <input id="threatIp" class="input" type="text" placeholder="Enter IPv4 address" style="flex:1;" />
+              <button id="trackThreatBtn" class="btn btn-danger">🚨 TRACK</button>
+            </div>
           </div>
           <div class="row">
-            <div class="label">Fusion data snapshot</div>
+            <div class="label">Threat History</div>
+            <div class="trafficTableWrap">
+              <table class="table">
+                <thead><tr><th>IP</th><th>Level</th><th>Score</th><th>Activities</th><th>Timestamp</th></tr></thead>
+                <tbody id="threatTable"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7. Reports ট্যাব -->
+      <div id="tabReports" class="tab">
+        <div class="panelTitle">Fusion Reports & Artifacts</div>
+        <div class="glass panel">
+          <div class="row">
+            <div class="label">Last Run</div>
+            <div id="lastRun" class="mono">No defensive scan yet.</div>
+          </div>
+          <div class="row">
+            <div class="label">Fusion Data (Full JSON)</div>
             <pre id="fusionPreview" class="pre"></pre>
           </div>
         </div>
       </div>
 
-      <!-- Settings ট্যাব (কাস্টম এডিটর) -->
+      <!-- 8. Settings ট্যাব (কাস্টম এডিটর) -->
       <div id="tabSettings" class="tab">
         <div class="panelTitle">Settings • Custom Tools Editor</div>
         <div class="glass panel">
           <div class="row">
-            <div class="label">Custom files</div>
+            <div class="label">Custom Files</div>
             <div>
               <div class="smallNote">
-                এখানে আপনি <b>customModules.js</b> এবং <b>toolRunner.js</b> এডিট করে Save দিলে, অ্যাপ সাথে সাথে সেই কোড ব্যবহার করে “🔧 RUN CUSTOM TOOLS” চালাবে।
-                <br>নোট: নিরাপত্তার জন্য কাস্টম কোড sandbox‑এ লোড হয় (require/process নেই)। আপনার টুলগুলোকে ডিফেন্সিভ রিভিউ/ডাটা প্রসেসিং কাজে রাখুন।
+                ✏️ Edit <strong>customModules.js</strong> and <strong>toolRunner.js</strong> – save and run instantly.<br>
+                ⚠️ No sandbox – full Node.js access. Use only your own code.
               </div>
               <div class="settingsBtns">
-                <button id="openCustomDirBtn" class="btn btn-secondary btn-sm">📁 Open custom folder</button>
-                <button id="reloadEditorsBtn" class="btn btn-secondary btn-sm">🔄 Reload editors</button>
+                <button id="openCustomDirBtn" class="btn btn-secondary btn-sm">📁 Open Folder</button>
+                <button id="reloadEditorsBtn" class="btn btn-secondary btn-sm">🔄 Reload</button>
               </div>
             </div>
           </div>
@@ -128,25 +174,25 @@
           <div class="twoCol">
             <div class="codeCard">
               <div class="codeHeader">
-                <div class="codeTitle">customModules.js</div>
+                <div class="codeTitle">📜 customModules.js</div>
                 <div class="codeActions">
                   <button id="openCustomModulesBtn" class="btn btn-secondary btn-sm">Open</button>
                   <button id="saveCustomModulesBtn" class="btn btn-success btn-sm">Save</button>
                 </div>
               </div>
-              <textarea id="editorCustomModules" class="codeEditor" spellcheck="false"></textarea>
+              <textarea id="editorCustomModules" class="codeEditor" spellcheck="false" placeholder="// Write your custom tools here..."></textarea>
               <div id="statusCustomModules" class="codeStatus smallNote"></div>
             </div>
 
             <div class="codeCard">
               <div class="codeHeader">
-                <div class="codeTitle">toolRunner.js</div>
+                <div class="codeTitle">⚙️ toolRunner.js</div>
                 <div class="codeActions">
                   <button id="openToolRunnerBtn" class="btn btn-secondary btn-sm">Open</button>
                   <button id="saveToolRunnerBtn" class="btn btn-success btn-sm">Save</button>
                 </div>
               </div>
-              <textarea id="editorToolRunner" class="codeEditor" spellcheck="false"></textarea>
+              <textarea id="editorToolRunner" class="codeEditor" spellcheck="false" placeholder="// Orchestrate your custom modules here..."></textarea>
               <div id="statusToolRunner" class="codeStatus smallNote"></div>
             </div>
           </div>
@@ -160,31 +206,33 @@
         </div>
       </div>
 
-      <!-- Local ট্যাব -->
+      <!-- 9. Local Info ট্যাব -->
       <div id="tabLocal" class="tab">
-        <div class="panelTitle">Local (Safe)</div>
+        <div class="panelTitle">System & Local Information</div>
         <div class="glass panel">
           <div class="row">
             <div class="label">System Info</div>
-            <div id="systemInfo" class="smallNote">Loading...</div>
+            <div id="systemInfo" class="mono">Loading...</div>
           </div>
           <div class="row">
-            <div class="label">Export</div>
+            <div class="label">Disclaimer</div>
             <div class="smallNote">
-              “📦 COMPRESS ALL REPORTS” চাপলে রিপোর্টগুলো আপনার Downloads ফোল্ডারে ZIP আকারে সেভ হবে।
+              ⚡ This application runs with <strong>no security restrictions</strong> – full disk, network and OS access.<br>
+              🛡️ Use only on your own systems or with explicit permission.<br>
+              🐉 Dragon mode active – enjoy the power.
             </div>
           </div>
         </div>
       </div>
+
     </section>
   </main>
 
-  <!-- স্ট্যাটাস বার (ঐচ্ছিক) -->
+  <!-- ফুটার / স্ট্যাটাস বার -->
   <footer class="statusBar">
-    <span>ShadowRecon Ultimate – Ready | Dragon active | All systems online</span>
+    <span id="statusMsg">🟢 ShadowRecon Ultimate – Ready. 200 tools loaded.</span>
   </footer>
 
-  <!-- রেন্ডারার স্ক্রিপ্ট (সব UI লজিক এখানে) -->
   <script src="renderer.js"></script>
 </body>
 </html>
