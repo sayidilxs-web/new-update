@@ -1,9 +1,9 @@
 // =======================================================================================
 // SHADOWRECON ULTIMATE - MAIN PROCESS (COMPLETE)
-// ফাইল: main.js | লাইন: ৫৫০+ | ইলেকট্রন মেইন প্রক্রিয়া, সব আইপিসি হ্যান্ডলার
+// ফাইল: main.js | লাইন: ৭০০+ | ইলেকট্রন মেইন প্রক্রিয়া, সব আইপিসি হ্যান্ডলার
 // =======================================================================================
 
-const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, shell, session } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
@@ -15,9 +15,9 @@ const vm = require('vm');
 const axios = require('axios');
 const AdmZip = require('adm-zip');
 
-const APP_TITLE = 'ShadowRecon Base – Custom Ready';
+const APP_TITLE = 'ShadowRecon Ultimate – No Limits';
 
-// গ্লোবাল ফিউশন ডাটা
+// ========================== গ্লোবাল ফিউশন ডাটা ==========================
 global.fusionData = {
   meta: {
     appTitle: APP_TITLE,
@@ -30,7 +30,9 @@ global.fusionData = {
     origin: ''
   },
   traffic: {
-    events: []
+    events: [],
+    totalRequests: 0,
+    totalResponses: 0
   },
   defensive: {
     results: {},
@@ -156,7 +158,7 @@ async function fetchWithTimeout(url, options = {}) {
     timeout: options.timeoutMs ?? 15000,
     maxRedirects: options.maxRedirects ?? 5,
     validateStatus: () => true,
-    headers: { 'User-Agent': 'ShadowRecon-Base/1.0', ...(options.headers || {}) }
+    headers: { 'User-Agent': 'ShadowRecon-Ultimate/1.0', ...(options.headers || {}) }
   });
   return instance.request({ url, method: options.method ?? 'GET', responseType: options.responseType ?? 'text' });
 }
@@ -512,6 +514,7 @@ function setupTrafficObservation(win, wcSession) {
   wcSession.webRequest.onBeforeSendHeaders((details, callback) => {
     const entry = { ts: new Date().toISOString(), type: 'request', requestId: details.id, url: details.url, method: details.method, requestHeaders: details.requestHeaders, resourceType: details.resourceType };
     global.fusionData.traffic.events.push(entry);
+    global.fusionData.traffic.totalRequests++;
     if (global.fusionData.traffic.events.length > 5000) global.fusionData.traffic.events.shift();
     emitToUI(win, 'traffic:event', entry);
     callback({ cancel: false });
@@ -519,6 +522,7 @@ function setupTrafficObservation(win, wcSession) {
   wcSession.webRequest.onHeadersReceived((details, callback) => {
     const entry = { ts: new Date().toISOString(), type: 'response', requestId: details.id, url: details.url, method: details.method, status: details.statusCode, responseHeaders: details.responseHeaders, resourceType: details.resourceType, ip: details.ip || null };
     global.fusionData.traffic.events.push(entry);
+    global.fusionData.traffic.totalResponses++;
     if (global.fusionData.traffic.events.length > 5000) global.fusionData.traffic.events.shift();
     emitToUI(win, 'traffic:event', entry);
     callback({ cancel: false });
@@ -530,8 +534,8 @@ let trafficHookedSessions = new Set();
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 1240,
-    height: 820,
+    width: 1400,
+    height: 900,
     backgroundColor: '#0b0f14',
     title: APP_TITLE,
     webPreferences: {
@@ -558,6 +562,8 @@ function createWindow() {
     trafficHookedSessions.add(s0.id);
     setupTrafficObservation(mainWindow, s0);
   }
+  // ডেভ টুলস (প্রয়োজনে)
+  // mainWindow.webContents.openDevTools();
 }
 
 app.whenReady().then(() => {
@@ -567,6 +573,9 @@ app.whenReady().then(() => {
 });
 app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit(); });
 
+// ========================== আইপিসি হ্যান্ডলার (সব API) ==========================
+
+// ডিফেন্সিভ চেক
 ipcMain.handle('defensive:run', async (_evt, { targetUrl }) => {
   if (!mainWindow) return { ok: false, error: 'no-window' };
   try {
@@ -579,24 +588,27 @@ ipcMain.handle('defensive:run', async (_evt, { targetUrl }) => {
   }
 });
 
+// রিপোর্ট কম্প্রেস
 ipcMain.handle('reports:compress', async (_evt, { pickLocation }) => {
   if (!mainWindow) return { ok: false, error: 'no-window' };
   try { return await compressAllReports(mainWindow, { pickLocation: Boolean(pickLocation) }); }
   catch(e) { pushFeed(mainWindow, 'error', `ZIP export failed: ${String(e.message || e)}`); return { ok: false, error: String(e.message || e) }; }
 });
 
+// কাস্টম টুল রান
 ipcMain.handle('custom:run', async () => {
   if (!mainWindow) return { ok: false, error: 'no-window' };
   return runUserTools(mainWindow);
 });
 
+// ফিউশন ডাটা
 ipcMain.handle('fusion:get', async () => global.fusionData);
 
+// সেটিংস
 ipcMain.handle('settings:get', async () => {
   const paths = ensureCustomFilesExist();
   return { customDir: paths.dir, customModulesPath: paths.customModulesPath, toolRunnerPath: paths.toolRunnerPath };
 });
-
 ipcMain.handle('settings:read', async (_evt, { kind }) => {
   const p = ensureCustomFilesExist();
   const pick = (k) => { if (k === 'customModules') return p.customModulesPath; if (k === 'toolRunner') return p.toolRunnerPath; return null; };
@@ -605,7 +617,6 @@ ipcMain.handle('settings:read', async (_evt, { kind }) => {
   try { const content = fs.readFileSync(filePath, 'utf8'); return { ok: true, content }; }
   catch(e) { return { ok: false, error: String(e.message || e) }; }
 });
-
 ipcMain.handle('settings:write', async (_evt, { kind, content }) => {
   const p = ensureCustomFilesExist();
   const pick = (k) => { if (k === 'customModules') return p.customModulesPath; if (k === 'toolRunner') return p.toolRunnerPath; return null; };
@@ -623,7 +634,6 @@ ipcMain.handle('settings:write', async (_evt, { kind, content }) => {
     return { ok: true, warnings };
   } catch(e) { return { ok: false, error: String(e.message || e) }; }
 });
-
 ipcMain.handle('settings:open', async (_evt, { kind }) => {
   const p = ensureCustomFilesExist();
   if (kind === 'dir') return shell.openPath(p.dir);
@@ -631,5 +641,62 @@ ipcMain.handle('settings:open', async (_evt, { kind }) => {
   if (kind === 'toolRunner') return shell.openPath(p.toolRunnerPath);
   return null;
 });
+
+// টুলস (ডামি ডাটা)
+ipcMain.handle('tool:list', async () => {
+  // ডামি টুলস লিস্ট (আসল customModules.js এ থাকবে)
+  const tools = [];
+  for (let i = 1; i <= 200; i++) {
+    tools.push({ id: i, name: `Ultimate Tool ${i}`, category: i <= 50 ? 'Recon' : (i <= 100 ? 'Exploit' : (i <= 150 ? 'Defense' : 'Network')), enabled: true });
+  }
+  return tools;
+});
+ipcMain.handle('tool:run', async (event, toolId) => {
+  return { tool: `Tool ${toolId}`, output: `Tool ${toolId} executed successfully.`, exitCode: 0 };
+});
+
+// এক্সপ্লয়েট (ডামি)
+ipcMain.handle('exploit:list', async () => {
+  const exploits = [];
+  const risks = ['Critical', 'High', 'Medium', 'Low'];
+  for (let i = 1; i <= 100; i++) {
+    exploits.push({ id: `EXP-${i}`, name: `Exploit ${i}`, cve: `CVE-2024-${1000+i}`, risk: risks[i%risks.length], payload: `PAYLOAD_${i}` });
+  }
+  return exploits;
+});
+ipcMain.handle('exploit:run', async (event, id, target) => {
+  return { success: true, exploit: id, target, payload: 'test_payload', output: `Exploit ${id} attempted on ${target}.`, risk: 'Medium' };
+});
+
+// নেটওয়ার্ক ক্যাপচার (স্টাব)
+ipcMain.handle('network:capture:start', async () => ({ active: true }));
+ipcMain.handle('network:capture:stop', async () => ({ active: false }));
+ipcMain.handle('network:capture:get', async () => []);
+ipcMain.handle('network:capture:export', async () => ({ path: 'fake.pcap' }));
+
+// সিস্টেম
+ipcMain.handle('system:info', async () => ({
+  platform: os.platform(), arch: os.arch(), cpus: os.cpus().length, totalMemory: os.totalmem(), freeMemory: os.freemem(), hostname: os.hostname(), uptime: os.uptime()
+}));
+ipcMain.handle('system:command', async (event, cmd) => {
+  const { exec } = require('child_process');
+  return new Promise((resolve) => {
+    exec(cmd, { timeout: 30000, maxBuffer: 10*1024*1024 }, (err, stdout, stderr) => {
+      resolve({ stdout: stdout || '', stderr: stderr || '', error: err ? err.message : null });
+    });
+  });
+});
+ipcMain.handle('system:killProcess', async (event, pid) => {
+  try { process.kill(pid); return { ok: true }; } catch(e) { return { ok: false, error: e.message }; }
+});
+
+// থ্রেট চেক (ডামি)
+ipcMain.handle('threat:check', async (event, ip) => {
+  const score = Math.random() * 100;
+  return { ip, threatScore: score, level: score > 80 ? 'DANGEROUS' : (score > 50 ? 'SUSPICIOUS' : 'SAFE'), activities: score > 70 ? ['scan','brute'] : ['normal'], timestamp: new Date().toISOString() };
+});
+
+// রিপোর্ট জেনারেট (স্টাব)
+ipcMain.handle('report:generate', async () => ({ baseName: `report_${Date.now()}` }));
 
 console.log('✅ main.js সম্পূর্ণ লোড – সব হ্যান্ডলার রেডি');
