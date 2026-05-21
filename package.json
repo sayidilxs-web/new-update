@@ -1,1 +1,217 @@
-
+{
+  "name": "shadowrecon-ultimate",
+  "productName": "ShadowRecon Ultimate",
+  "version": "7.7.7",
+  "description": "Complete penetration testing framework with 200+ tools, exploit database, network sniffer, and unlimited system access.",
+  "main": "main.js",
+  "author": {
+    "name": "ShadowRecon Labs",
+    "email": "contact@shadowrecon.local",
+    "url": "https://github.com/shadowrecon"
+  },
+  "license": "MIT",
+  "private": false,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shadowrecon/shadowrecon-ultimate"
+  },
+  "bugs": {
+    "url": "https://github.com/shadowrecon/shadowrecon-ultimate/issues"
+  },
+  "homepage": "https://github.com/shadowrecon/shadowrecon-ultimate#readme",
+  "keywords": [
+    "security",
+    "penetration-testing",
+    "exploit",
+    "network-scanner",
+    "vulnerability-scanner",
+    "electron",
+    "hacking-tools",
+    "cybersecurity",
+    "bug-bounty",
+    "reconnaissance",
+    "darkweb",
+    "blockchain"
+  ],
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win --x64",
+    "build:linux": "electron-builder --linux",
+    "build:mac": "electron-builder --mac",
+    "pack": "electron-builder --dir",
+    "postinstall": "electron-builder install-app-deps",
+    "clean": "rimraf dist/ reports/ logs/ tools/",
+    "dev": "electron . --debug",
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "dependencies": {
+    "adm-zip": "^0.5.16",
+    "axios": "^1.7.9",
+    "ws": "^8.18.0",
+    "socket.io-client": "^4.8.1",
+    "express": "^4.21.2",
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "nodemailer": "^6.9.16",
+    "puppeteer-core": "^24.4.0",
+    "cheerio": "^1.0.0",
+    "sharp": "^0.33.5",
+    "qrcode": "^1.5.4",
+    "csv-writer": "^1.6.0",
+    "pdfkit": "^0.16.0",
+    "archiver": "^7.0.1",
+    "extract-zip": "^2.0.1",
+    "ssh2": "^1.17.0",
+    "mysql2": "^3.12.0",
+    "pg": "^8.13.1",
+    "redis": "^4.7.0",
+    "mongodb": "^6.12.0",
+    "sqlite3": "^5.1.7",
+    "better-sqlite3": "^11.7.0",
+    "socket.io": "^4.8.1",
+    "http-proxy": "^1.18.1",
+    "https-proxy-agent": "^7.0.6",
+    "socks-proxy-agent": "^8.0.5",
+    "tor-control": "^1.0.6",
+    "dns2": "^2.1.2",
+    "whois": "^2.14.0",
+    "geoip-lite": "^1.4.10",
+    "public-ip": "^7.0.1",
+    "internal-ip": "^9.0.1",
+    "macaddress": "^0.5.3",
+    "systeminformation": "^5.25.11",
+    "drivelist": "^12.0.0",
+    "node-disk-info": "^1.3.0",
+    "windows-registry": "^4.0.5",
+    "winreg": "^1.2.5",
+    "sudo-prompt": "^9.2.1",
+    "node-notifier": "^10.0.1",
+    "electron-updater": "^6.3.9",
+    "electron-log": "^5.2.2",
+    "electron-store": "^10.0.0",
+    "electron-context-menu": "^4.0.1",
+    "electron-squirrel-startup": "^1.0.1"
+  },
+  "devDependencies": {
+    "electron": "^42.2.0",
+    "electron-builder": "^26.8.1",
+    "rimraf": "^6.0.1",
+    "eslint": "^9.21.0",
+    "prettier": "^3.4.2"
+  },
+  "build": {
+    "appId": "com.shadowrecon.ultimate",
+    "productName": "ShadowRecon Ultimate",
+    "copyright": "Copyright © 2025 ShadowRecon Labs",
+    "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
+    "directories": {
+      "output": "dist",
+      "buildResources": "assets"
+    },
+    "files": [
+      "**/*",
+      "!dist/**",
+      "!reports/**",
+      "!logs/**",
+      "!tools/**",
+      "!captures/**",
+      "!.git/**",
+      "!.vscode/**",
+      "!node_modules/.cache/**",
+      "!**/*.log",
+      "!**/*.pcap"
+    ],
+    "asar": true,
+    "asarUnpack": [
+      "node_modules/ssh2/**",
+      "node_modules/puppeteer-core/**",
+      "node_modules/winreg/**",
+      "node_modules/sudo-prompt/**"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64", "ia32"]
+        },
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "assets/icon.ico",
+      "legalTrademarks": "ShadowRecon",
+      "publisherName": "ShadowRecon Labs",
+      "certificateFile": "cert.pfx",
+      "certificatePassword": "",
+      "signAndEditExecutable": true,
+      "signDlls": true
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true,
+      "deleteAppDataOnUninstall": false,
+      "runAfterFinish": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "ShadowRecon Ultimate",
+      "installerIcon": "assets/icon.ico",
+      "uninstallerIcon": "assets/icon.ico",
+      "license": "LICENSE.txt",
+      "installerHeaderIcon": "assets/icon.ico"
+    },
+    "portable": {
+      "artifactName": "${productName}-Portable-${version}.exe",
+      "requestExecutionLevel": "highestAvailable"
+    },
+    "linux": {
+      "target": ["AppImage", "deb", "rpm", "snap"],
+      "category": "Development",
+      "icon": "assets/icon.png",
+      "synopsis": "Ultimate Penetration Testing Framework",
+      "description": "Complete security assessment toolkit with 200+ tools",
+      "maintainer": "ShadowRecon Labs <contact@shadowrecon.local>"
+    },
+    "mac": {
+      "target": ["dmg", "zip"],
+      "icon": "assets/icon.icns",
+      "category": "public.app-category.developer-tools",
+      "darkModeSupport": true,
+      "hardenedRuntime": false,
+      "gatekeeperAssess": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist"
+    },
+    "dmg": {
+      "title": "ShadowRecon Ultimate Installer",
+      "icon": "assets/icon.icns",
+      "background": "assets/dmg-bg.png",
+      "window": {
+        "width": 540,
+        "height": 380
+      }
+    },
+    "extraResources": [
+      {
+        "from": "assets/",
+        "to": "assets/",
+        "filter": ["**/*"]
+      }
+    ],
+    "publish": {
+      "provider": "github",
+      "releaseType": "release",
+      "vPrefixedTagName": true
+    }
+  },
+  "electronBuilder": {
+    "nodeGypRebuild": true,
+    "buildDependenciesFromSource": true,
+    "npmRebuild": true,
+    "prepack": "npm run build",
+    "postpack": "echo 'Build complete'"
+  }
+}
